@@ -1,0 +1,29 @@
+.chart-card {
+    min-height: 300px;
+}
+
+.chart-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chart-card-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.chart-card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.chart-card-body {
+    position: relative;
+    min-height: 250px;
+}

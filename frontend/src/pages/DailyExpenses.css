@@ -1,0 +1,125 @@
+.daily-expenses {
+    padding: var(--spacing-xl);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-xl);
+}
+
+.page-header h1 {
+    font-size: var(--text-4xl);
+    background: linear-gradient(135deg, var(--primary-400), var(--accent-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-sm);
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+}
+
+.expense-form {
+    margin-bottom: var(--spacing-xl);
+}
+
+.expense-form h3 {
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.filters-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.filters-section h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.filter-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+.total-label {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.total-amount {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-400), var(--accent-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.total-count {
+    color: var(--text-tertiary);
+    font-size: var(--text-sm);
+}
+
+.expenses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.loading-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-3xl);
+    gap: var(--spacing-lg);
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-3xl);
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 768px) {
+    .daily-expenses {
+        padding: var(--spacing-md);
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .page-header h1 {
+        font-size: var(--text-3xl);
+    }
+
+    .expenses-grid {
+        grid-template-columns: 1fr;
+    }
+}
