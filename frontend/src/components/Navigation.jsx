@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import './Navigation.css';
 
 export default function Navigation() {
@@ -30,6 +30,9 @@ export default function Navigation() {
                     </NavLink>
                     <NavLink to="/categories" className={({ isActive }) => isActive ? 'active' : ''}>
                         🏷️ Categories
+                    </NavLink>
+                    <NavLink to="/bank-accounts" className={({ isActive }) => isActive ? 'active' : ''}>
+                        🏦 Bank Accounts
                     </NavLink>
                     <NavLink to="/comparison" className={({ isActive }) => isActive ? 'active' : ''}>
                         📈 Comparison

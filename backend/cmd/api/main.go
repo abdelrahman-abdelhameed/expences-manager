@@ -33,6 +33,7 @@ func main() {
 		&models.Category{},
 		&models.DailyExpense{},
 		&models.MonthlyPlan{},
+		&models.BankAccount{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
@@ -45,6 +46,7 @@ func main() {
 	expenseHandler := handlers.NewExpenseHandler()
 	monthlyPlanHandler := handlers.NewMonthlyPlanHandler()
 	reportHandler := handlers.NewReportHandler()
+	bankAccountHandler := handlers.NewBankAccountHandler()
 
 	// Setup router
 	router := mux.NewRouter()
@@ -85,6 +87,16 @@ func main() {
 	api.HandleFunc("/monthly-plans/{id}", monthlyPlanHandler.DeleteMonthlyPlan).Methods("DELETE")
 	api.HandleFunc("/monthly-plans/{year}/{month}", monthlyPlanHandler.GetMonthlyPlanByYearMonth).Methods("GET")
 
+	// Bank Account routes
+	api.HandleFunc("/bank-accounts", bankAccountHandler.GetBankAccounts).Methods("GET")
+	api.HandleFunc("/bank-accounts", bankAccountHandler.CreateBankAccount).Methods("POST")
+	api.HandleFunc("/bank-accounts/{id}", bankAccountHandler.GetBankAccount).Methods("GET")
+	api.HandleFunc("/bank-accounts/{id}", bankAccountHandler.UpdateBankAccount).Methods("PUT")
+	api.HandleFunc("/bank-accounts/{id}", bankAccountHandler.DeleteBankAccount).Methods("DELETE")
+	api.HandleFunc("/bank-accounts/{id}/balance", bankAccountHandler.GetBankAccountBalance).Methods("GET")
+	api.HandleFunc("/bank-accounts/{id}/balance", bankAccountHandler.UpdateBankAccountBalance).Methods("PUT")
+
+	//
 	// Report routes
 	api.HandleFunc("/reports/monthly/{year}/{month}", reportHandler.GetMonthlyReport).Methods("GET")
 	api.HandleFunc("/reports/category/{year}/{month}", reportHandler.GetCategoryReport).Methods("GET")

@@ -9,7 +9,5 @@ export const categoryService = {
 
     update: (id, data) => api.put(`/categories/${id}`, data),
 
-    delete: (id) => api.delete(`/categories/${id}`, {
-        headers: getAuthHeader()
-    }),
+    delete: (id) => api.delete(`/categories/${id}`),
 };
