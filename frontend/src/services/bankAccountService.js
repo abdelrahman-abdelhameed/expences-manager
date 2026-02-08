@@ -14,4 +14,8 @@ export const bankAccountService = {
     getBalance: (id) => api.get(`/bank-accounts/${id}/balance`),
 
     updateBalance: (id, balance) => api.put(`/bank-accounts/${id}/balance`, { balance }),
+
+    getTransactions: (id, limit = 50) => api.get(`/bank-accounts/${id}/transactions?limit=${limit}`),
+
+    addTransaction: (id, data) => api.post(`/bank-accounts/${id}/transactions`, data),
 };

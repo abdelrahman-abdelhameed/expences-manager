@@ -34,6 +34,7 @@ func main() {
 		&models.DailyExpense{},
 		&models.MonthlyPlan{},
 		&models.BankAccount{},
+		&models.BankAccountTransaction{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
@@ -95,6 +96,8 @@ func main() {
 	api.HandleFunc("/bank-accounts/{id}", bankAccountHandler.DeleteBankAccount).Methods("DELETE")
 	api.HandleFunc("/bank-accounts/{id}/balance", bankAccountHandler.GetBankAccountBalance).Methods("GET")
 	api.HandleFunc("/bank-accounts/{id}/balance", bankAccountHandler.UpdateBankAccountBalance).Methods("PUT")
+	api.HandleFunc("/bank-accounts/{id}/transactions", bankAccountHandler.GetBankAccountTransactions).Methods("GET")
+	api.HandleFunc("/bank-accounts/{id}/transactions", bankAccountHandler.CreateBankAccountTransaction).Methods("POST")
 
 	//
 	// Report routes

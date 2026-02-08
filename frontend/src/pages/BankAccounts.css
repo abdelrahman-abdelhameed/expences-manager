@@ -185,6 +185,90 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.transactions-panel {
+  margin-top: 24px;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.transactions-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.transactions-balance {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.transactions-form {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #151e30
+}
+
+.transactions-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.transactions-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.transactions-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.transactions-list li:last-child {
+  border-bottom: none;
+}
+
+.tx-type {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.tx-desc {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.tx-amount {
+  font-weight: 600;
+}
+
+.tx-credit .tx-amount {
+  color: #15803d;
+}
+
+.tx-debit .tx-amount {
+  color: #b91c1c;
+}
+
 .accounts-list h2 {
   margin: 0 0 20px 0;
   font-size: 18px;
@@ -219,5 +303,11 @@
 
   .account-stats {
     grid-template-columns: 1fr;
+  }
+
+  .transactions-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 }

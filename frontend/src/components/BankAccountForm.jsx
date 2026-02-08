@@ -8,7 +8,7 @@ const BankAccountForm = ({ account, onSubmit, onCancel }) => {
     account_type: account?.account_type || 'Checking',
     account_number: account?.account_number || '',
     balance: account?.balance || 0,
-    currency: account?.currency || 'USD',
+    currency: account?.currency || 'SAR',
     color: account?.color || '#3B82F6',
     icon: account?.icon || '🏦',
     notes: account?.notes || '',
@@ -40,7 +40,7 @@ const BankAccountForm = ({ account, onSubmit, onCancel }) => {
       bank_name: formData.bank_name.trim(),
       account_number: formData.account_number.trim(),
       account_type: formData.account_type.trim(),
-      currency: (formData.currency || 'USD').toUpperCase(),
+      currency: (formData.currency || 'SAR').toUpperCase(),
       balance: Number.isNaN(balanceValue) ? 0 : balanceValue,
     };
     onSubmit(payload);
@@ -49,7 +49,7 @@ const BankAccountForm = ({ account, onSubmit, onCancel }) => {
   const accountTypes = ['Checking', 'Savings', 'Credit Card', 'Investment', 'Money Market', 'CD'];
   const currencies = [
     { value: 'SAR', label: 'SAR (SR)' },
-    { value: 'USD', label: 'USD' },
+  
    
   ];
 

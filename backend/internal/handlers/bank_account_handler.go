@@ -2,13 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/abdelrahman/expense-manager/internal/database"
 	"github.com/abdelrahman/expense-manager/internal/middleware"
 	"github.com/abdelrahman/expense-manager/internal/models"
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 type BankAccountHandler struct{}
@@ -256,4 +259,156 @@ func (h *BankAccountHandler) UpdateBankAccountBalance(w http.ResponseWriter, r *
 	}
 
 	respondWithJSON(w, http.StatusOK, account)
+}
+
+// GetBankAccountTransactions returns recent transactions for a bank account
+func (h *BankAccountHandler) GetBankAccountTransactions(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "User not authenticated")
+		return
+	}
+
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid bank account ID")
+		return
+	}
+
+	limit := 50
+	if limitParam := r.URL.Query().Get("limit"); limitParam != "" {
+		if parsed, err := strconv.Atoi(limitParam); err == nil && parsed > 0 {
+			if parsed > 200 {
+				parsed = 200
+			}
+			limit = parsed
+		}
+	}
+
+	var account models.BankAccount
+	if err := database.GetDB().Where("id = ? AND user_id = ?", id, userID).First(&account).Error; err != nil {
+		respondWithError(w, http.StatusNotFound, "Bank account not found")
+		return
+	}
+
+	var transactions []models.BankAccountTransaction
+	if err := database.GetDB().
+		Where("bank_account_id = ? AND user_id = ?", account.ID, userID).
+		Order("created_at DESC").
+		Limit(limit).
+		Find(&transactions).Error; err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Failed to fetch transactions")
+		return
+	}
+
+	if transactions == nil {
+		transactions = []models.BankAccountTransaction{}
+	}
+
+	respondWithJSON(w, http.StatusOK, transactions)
+}
+
+type bankAccountTransactionRequest struct {
+	Amount      float64 `json:"amount"`
+	Type        string  `json:"type"`
+	Description string  `json:"description"`
+}
+
+// CreateBankAccountTransaction adds or subtracts money from a bank account
+func (h *BankAccountHandler) CreateBankAccountTransaction(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "User not authenticated")
+		return
+	}
+
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid bank account ID")
+		return
+	}
+
+	var req bankAccountTransactionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	if req.Amount <= 0 {
+		respondWithError(w, http.StatusBadRequest, "Amount must be greater than zero")
+		return
+	}
+
+	transactionType, err := normalizeTransactionType(req.Type)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var updatedAccount models.BankAccount
+	var createdTransaction models.BankAccountTransaction
+
+	if err := database.GetDB().Transaction(func(tx *gorm.DB) error {
+		var account models.BankAccount
+		if err := tx.Where("id = ? AND user_id = ?", id, userID).First(&account).Error; err != nil {
+			return err
+		}
+
+		newBalance := account.Balance
+		switch transactionType {
+		case "credit":
+			newBalance += req.Amount
+		case "debit":
+			if account.Balance-req.Amount < 0 {
+				return errors.New("Insufficient funds")
+			}
+			newBalance -= req.Amount
+		}
+
+		account.Balance = newBalance
+		if err := tx.Save(&account).Error; err != nil {
+			return err
+		}
+
+		transaction := models.BankAccountTransaction{
+			UserID:        userID,
+			BankAccountID: account.ID,
+			Type:          transactionType,
+			Amount:        req.Amount,
+			Description:   req.Description,
+		}
+		if err := tx.Create(&transaction).Error; err != nil {
+			return err
+		}
+
+		updatedAccount = account
+		createdTransaction = transaction
+		return nil
+	}); err != nil {
+		if err.Error() == "Insufficient funds" {
+			respondWithError(w, http.StatusBadRequest, "Insufficient funds")
+			return
+		}
+		respondWithError(w, http.StatusInternalServerError, "Failed to create transaction")
+		return
+	}
+
+	respondWithJSON(w, http.StatusCreated, map[string]interface{}{
+		"transaction": createdTransaction,
+		"balance":     updatedAccount.Balance,
+	})
+}
+
+func normalizeTransactionType(input string) (string, error) {
+	value := strings.ToLower(strings.TrimSpace(input))
+	switch value {
+	case "credit", "add", "deposit", "in":
+		return "credit", nil
+	case "debit", "sub", "subtract", "withdraw", "out":
+		return "debit", nil
+	default:
+		return "", errors.New("Transaction type must be add/credit or sub/debit")
+	}
 }

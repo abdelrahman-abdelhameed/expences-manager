@@ -11,15 +11,24 @@ const BankAccounts = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   const [totalBalance, setTotalBalance] = useState(0);
+  const [transactionAccount, setTransactionAccount] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [transactionForm, setTransactionForm] = useState({
+    amount: '',
+    type: 'credit',
+    description: '',
+  });
+  const [transactionsLoading, setTransactionsLoading] = useState(false);
+  const [transactionsError, setTransactionsError] = useState(null);
 
   const getCurrencyLabel = (currency) => {
-    const code = (currency || 'USD').toUpperCase();
+    const code = (currency || 'SAR').toUpperCase();
     return code === 'SAR' || code === 'SR' ? 'SR' : code;
   };
 
   const getSummaryCurrency = () => {
     const currencies = Array.from(
-      new Set(accounts.map((account) => (account.currency || 'USD').toUpperCase()))
+      new Set(accounts.map((account) => (account.currency || 'SAR').toUpperCase()))
     );
     if (currencies.length === 1) {
       return currencies[0];
@@ -102,6 +111,77 @@ const BankAccounts = () => {
     setEditingAccount(null);
   };
 
+  const openTransactions = async (account) => {
+    setTransactionAccount(account);
+    setTransactionsError(null);
+    setTransactionForm({ amount: '', type: 'credit', description: '' });
+    await loadTransactions(account.id);
+  };
+
+  const closeTransactions = () => {
+    setTransactionAccount(null);
+    setTransactions([]);
+    setTransactionsError(null);
+  };
+
+  const loadTransactions = async (accountId) => {
+    try {
+      setTransactionsLoading(true);
+      const response = await bankAccountService.getTransactions(accountId, 50);
+      setTransactions(response.data || []);
+    } catch (err) {
+      console.error('Error fetching transactions:', err);
+      setTransactionsError('Failed to load transactions');
+    } finally {
+      setTransactionsLoading(false);
+    }
+  };
+
+  const handleTransactionChange = (e) => {
+    const { name, value } = e.target;
+    setTransactionForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleTransactionSubmit = async (e) => {
+    e.preventDefault();
+    if (!transactionAccount) {
+      return;
+    }
+    const amountValue = Number(transactionForm.amount);
+    if (!amountValue || amountValue <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+    try {
+      const response = await bankAccountService.addTransaction(transactionAccount.id, {
+        amount: amountValue,
+        type: transactionForm.type,
+        description: transactionForm.description,
+      });
+      const createdTransaction = response.data?.transaction;
+      const updatedBalance = response.data?.balance;
+
+      if (createdTransaction) {
+        setTransactions((prev) => [createdTransaction, ...prev]);
+      }
+      if (typeof updatedBalance === 'number') {
+        setAccounts((prev) =>
+          prev.map((acc) =>
+            acc.id === transactionAccount.id ? { ...acc, balance: updatedBalance } : acc
+          )
+        );
+        setTransactionAccount((prev) =>
+          prev ? { ...prev, balance: updatedBalance } : prev
+        );
+      }
+      setTransactionForm({ amount: '', type: transactionForm.type, description: '' });
+    } catch (err) {
+      console.error('Error adding transaction:', err);
+      const apiMessage = err?.response?.data?.error || err?.response?.data?.message;
+      alert(apiMessage || 'Failed to add transaction');
+    }
+  };
+
   return (
     <div className="bank-accounts-page">
       <div className="page-header">
@@ -165,9 +245,93 @@ const BankAccounts = () => {
                 account={account}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onTransactions={openTransactions}
               />
             ))}
           </div>
+
+          {transactionAccount && (
+            <div className="transactions-panel">
+              <div className="transactions-header">
+                <div>
+                  <h3>Transactions: {transactionAccount.account_name}</h3>
+                  <span className="transactions-balance">
+                    {getCurrencyLabel(transactionAccount.currency)} {Number(transactionAccount.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <button className="btn-secondary" onClick={closeTransactions}>Close</button>
+              </div>
+
+              <form className="transactions-form" onSubmit={handleTransactionSubmit}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="transaction_amount">Amount *</label>
+                    <input
+                      id="transaction_amount"
+                      type="number"
+                      name="amount"
+                      value={transactionForm.amount}
+                      onChange={handleTransactionChange}
+                      placeholder="0.00"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="transaction_type">Type *</label>
+                    <select
+                      id="transaction_type"
+                      name="type"
+                      value={transactionForm.type}
+                      onChange={handleTransactionChange}
+                    >
+                      <option value="credit">Add Money</option>
+                      <option value="debit">Subtract Money</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="transaction_description">Description</label>
+                  <input
+                    id="transaction_description"
+                    type="text"
+                    name="description"
+                    value={transactionForm.description}
+                    onChange={handleTransactionChange}
+                    placeholder="e.g., Salary, ATM withdrawal"
+                  />
+                </div>
+                <div className="transactions-actions">
+                  <button type="submit" className="btn-primary">Save Transaction</button>
+                </div>
+              </form>
+
+              <div className="transactions-list">
+                <h4>Recent Transactions</h4>
+                {transactionsLoading ? (
+                  <div className="loading">Loading transactions...</div>
+                ) : transactionsError ? (
+                  <div className="error">{transactionsError}</div>
+                ) : transactions.length === 0 ? (
+                  <div className="empty-state">No transactions yet.</div>
+                ) : (
+                  <ul>
+                    {transactions.map((tx) => (
+                      <li key={tx.id} className={tx.type === 'debit' ? 'tx-debit' : 'tx-credit'}>
+                        <div>
+                          <span className="tx-type">{tx.type === 'debit' ? 'Subtract' : 'Add'}</span>
+                          {tx.description && <span className="tx-desc">{tx.description}</span>}
+                        </div>
+                        <span className="tx-amount">
+                          {tx.type === 'debit' ? '-' : '+'}{getCurrencyLabel(transactionAccount.currency)} {Number(tx.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

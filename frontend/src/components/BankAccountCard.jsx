@@ -1,9 +1,9 @@
 import React from 'react';
 import './BankAccountCard.css';
 
-const BankAccountCard = ({ account, onEdit, onDelete }) => {
+const BankAccountCard = ({ account, onEdit, onDelete, onTransactions }) => {
   const getCurrencyLabel = (currency) => {
-    const code = (currency || 'USD').toUpperCase();
+    const code = (currency || 'SAR').toUpperCase();
     return code === 'SAR' || code === 'SR' ? 'SR' : code;
   };
 
@@ -17,6 +17,12 @@ const BankAccountCard = ({ account, onEdit, onDelete }) => {
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete ${account.account_name}?`)) {
       onDelete(account.id);
+    }
+  };
+
+  const handleTransactions = () => {
+    if (onTransactions) {
+      onTransactions(account);
     }
   };
 
@@ -65,6 +71,9 @@ const BankAccountCard = ({ account, onEdit, onDelete }) => {
       </div>
 
       <div className="card-actions">
+        <button className="btn-transactions" onClick={handleTransactions} title="Transactions">
+          ⇄
+        </button>
         <button className="btn-edit" onClick={handleEdit} title="Edit account">
           ✎
         </button>
