@@ -1,0 +1,223 @@
+.bank-accounts-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #2563eb;
+}
+
+.form-container {
+  margin-bottom: 32px;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading,
+.error {
+  padding: 24px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.loading {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  color: #1f2937;
+}
+
+.empty-state p {
+  margin: 0 0 24px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.summary-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.summary-amount {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.summary-count {
+  display: block;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.account-stats {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.accounts-list {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.accounts-list h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #1f2937;
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .bank-accounts-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .btn-primary {
+    width: 100%;
+  }
+
+  .summary-section {
+    grid-template-columns: 1fr;
+  }
+
+  .account-stats {
+    grid-template-columns: 1fr;
+  }
+}
