@@ -49,7 +49,7 @@ const BankAccountForm = ({ account, onSubmit, onCancel }) => {
   const accountTypes = ['Checking', 'Savings', 'Credit Card', 'Investment', 'Money Market', 'CD'];
   const currencies = [
     { value: 'SAR', label: 'SAR (SR)' },
-  
+   
    
   ];
 
